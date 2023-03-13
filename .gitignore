@@ -26,6 +26,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.tgz
+*.tar
+*.tar.gz
+*.zip
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -133,5 +137,6 @@ videos/
 visua/
 .videos/
 .visua/
-
-.dataset1/
+/data
+/dataset1
+.dataset1/.
