@@ -1,4 +1,5 @@
 import torch
+import torchvision
 import argparse
 import cv2
 import detect_utils
@@ -13,12 +14,14 @@ parser.add_argument(
     '-i', '--input', default='input/image_1.jpg', 
     help='path to input input image'
 )
+parser.add_argument('-m', '--min-size', dest='min_size', default=800, 
+                    help='minimum input size for the FasterRCNN network')
 parser.add_argument(
     '-t', '--threshold', default=0.5, type=float,
     help='detection threshold'
 )
 parser.add_argument(
-    '-m', '--model', default='v2', 
+    '--model', default='v2', 
     help='faster rcnn resnet50 fpn or fpn v2',
     choices=['v1', 'v2']
 )
@@ -27,22 +30,18 @@ args = vars(parser.parse_args())
 
 # Define the computation device.
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = get_model(device, args['model'])
+# download or load the model from disk
+model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
+                                                    min_size=args['min_size'])
+image = Image.open(args['input'])
 
-# Read the image.
-image = Image.open(args['input']).convert('RGB')
+model.eval().to(device)
 
-# Create a BGR copy of the image for annotation.
-image_bgr = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+boxes, classes, labels = detect_utils.predict(image, model, device, 0.8)
 
-# Detect outputs.
-with torch.no_grad():
-    boxes, classes, labels = detect_utils.predict(image, model, device, args['threshold'])
-
-# Draw bounding boxes.
-image = detect_utils.draw_boxes(boxes, classes, labels, image_bgr)
-save_name = f"{args['input'].split('/')[-1].split('.')[0]}_t{''.join(str(args['threshold']).split('.'))}_{args['model']}"
+image = detect_utils.draw_boxes(boxes, classes, labels, image)
 
 cv2.imshow('Image', image)
+save_name = f"{args['input'].split('/')[-1].split('.')[0]}_{args['min_size']}"
 cv2.imwrite(f"outputs/{save_name}.jpg", image)
 cv2.waitKey(0)

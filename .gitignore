@@ -138,5 +138,9 @@ visua/
 .videos/
 .visua/
 /data
-/dataset1
+/dataset
+dataset
 .dataset1/.
+/input
+/output
+/outputs

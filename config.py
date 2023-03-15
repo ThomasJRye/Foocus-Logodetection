@@ -1,10 +1,12 @@
 # path to your own data and coco file
-train_data_dir = "dataset1/data"
-train_coco = "dataset1/labels.json"
+data_dir = "dataset/data"
+train_coco = "dataset/train.json"
+test_coco = "dataset/train.json"
+
 
 # Batch size
 train_batch_size = 1
-
+test_batch_size = 1
 # Params for dataloader
 train_shuffle_dl = True
 num_workers_dl = 4
