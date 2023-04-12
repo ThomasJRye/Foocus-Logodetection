@@ -44,7 +44,6 @@ class myOwnDataset(torch.utils.data.Dataset):
             boxes.append([xmin, ymin, xmax, ymax])
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
 
-        COCO_INSTANCE_CATEGORY_NAMES = ['Sparebanken Vest', 'Pretec', 'Borregaard', 'OBOS', 'Lyse', 'Sparebank1 SR Bank', 'Cegal', 'Bouvet', 'Coop', 'Sundolitt', 'AJ', 'DNB', 'Vanpee', '¥kland', 'Vaerste', 'Altibox', 'NorskTipping', 'Bama', 'Tine', 'Telenor', 'Sparebank1 SMN', 'Scandic', 'Fjordkraft', 'Gjensidige', 'Frydenb¢', 'Consto', 'Sparebank1 Nord Norge', 'Kiwi', 'Equinor', 'Santander', 'Sparebanken Møre', 'Sparebank1 group']
         # Labels
         labels = []
         for i in range(num_objs):
