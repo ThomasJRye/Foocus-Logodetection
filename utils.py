@@ -6,6 +6,8 @@ from PIL import Image
 from pycocotools.coco import COCO
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
+from coco_names import COCO_INSTANCE_CATEGORY_NAMES
+
 
 class myOwnDataset(torch.utils.data.Dataset):
     def __init__(self, root, annotation, transforms=None):
