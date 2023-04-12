@@ -20,6 +20,7 @@ def predict(image, model, device, detection_threshold):
     the model and return the bounding boxes, class names, and 
     class labels. 
     """
+    
     # Transform the image to tensor.
     image = transform(image).to(device)
     # Add a batch dimension.
@@ -37,8 +38,11 @@ def predict(image, model, device, detection_threshold):
 
     print(coco_names)
     print(labels.cpu().numpy())
+
+    
     # Get all the predicited class names.
-    pred_classes = [coco_names[i] for i in labels.cpu().numpy()]
+    pred_classes = [coco_names[i] if 0 <= i < len(coco_names) else 'unknown' for i in labels.cpu().numpy()]
+
     return boxes, pred_classes, labels
 
 
