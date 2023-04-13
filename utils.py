@@ -32,36 +32,36 @@ class myOwnDataset(torch.utils.data.Dataset):
         # number of objects in the image
         num_objs = len(coco_annotation)
 
-        # Bounding boxes for objects
-        # In coco format, bbox = [xmin, ymin, width, height]
-        # In pytorch, the input should be [xmin, ymin, xmax, ymax]
-        boxes = []
-        for i in range(num_objs):
-            xmin = coco_annotation[i]["bbox"][0]
-            ymin = coco_annotation[i]["bbox"][1]
-            xmax = xmin + coco_annotation[i]["bbox"][2]
-            ymax = ymin + coco_annotation[i]["bbox"][3]
-            boxes.append([xmin, ymin, xmax, ymax])
-        boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        # Handle the case when there are no annotations for the image
+        if num_objs == 0:
+            boxes = torch.zeros((0, 4), dtype=torch.float32)
+            labels = torch.zeros(0, dtype=torch.int64)
+            areas = torch.zeros(0, dtype=torch.float32)
+            iscrowd = torch.zeros(0, dtype=torch.int64)
+        else:
+            # Bounding boxes for objects
+            boxes = []
+            for i in range(num_objs):
+                xmin = coco_annotation[i]["bbox"][0]
+                ymin = coco_annotation[i]["bbox"][1]
+                xmax = xmin + coco_annotation[i]["bbox"][2]
+                ymax = ymin + coco_annotation[i]["bbox"][3]
+                boxes.append([xmin, ymin, xmax, ymax])
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
 
-        # Labels
-        labels = []
-        for i in range(num_objs):
-            category_id = coco_annotation[i]['category_id']
-            labels.append(category_id) 
-        
-        labels = torch.as_tensor(labels, dtype=torch.int64)
+            # Labels
+            labels = [ann['category_id'] for ann in coco_annotation]
+            labels = torch.as_tensor(labels, dtype=torch.int64)
 
+            # Size of bbox (Rectangular)
+            areas = [ann["area"] for ann in coco_annotation]
+            areas = torch.as_tensor(areas, dtype=torch.float32)
 
-        # Tensorise img_id
+            # Iscrowd
+            iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
+
+        # Tensorize img_id
         img_id = torch.tensor([img_id])
-        # Size of bbox (Rectangular)
-        areas = []
-        for i in range(num_objs):
-            areas.append(coco_annotation[i]["area"])
-        areas = torch.as_tensor(areas, dtype=torch.float32)
-        # Iscrowd
-        iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
 
         # Annotation is in dictionary format
         my_annotation = {}
@@ -75,6 +75,8 @@ class myOwnDataset(torch.utils.data.Dataset):
             img = self.transforms(img)
 
         return img, my_annotation
+
+
 
     def __len__(self):
         return len(self.ids)
