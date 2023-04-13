@@ -145,3 +145,7 @@ dataset1
 /input
 /output
 /outputs
+.models
+/models.
+.models/
+*.pth
