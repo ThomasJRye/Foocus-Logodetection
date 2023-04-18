@@ -123,6 +123,7 @@ venv.bak/
 
 # mkdocs documentation
 /site
+/mvpDataset
 
 # mypy
 .mypy_cache/

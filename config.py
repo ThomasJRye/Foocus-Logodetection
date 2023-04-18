@@ -1,7 +1,7 @@
 # path to your own data and coco file
-data_dir = "dataset/data"
-train_coco = "dataset/train.json"
-test_coco = "dataset/test.json"
+data_dir = "mvpDataset/data"
+train_coco = "mvpDataset/train.json"
+test_coco = "mvpDataset/test.json"
 
 
 # Batch size
