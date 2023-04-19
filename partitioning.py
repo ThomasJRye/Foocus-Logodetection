@@ -2,7 +2,7 @@ import json
 import random
 
 # Load COCO annotations file
-with open("mvpDataset/labels.json", "r") as f:
+with open("dataset1mvp/labels.json", "r") as f:
     coco = json.load(f)
 
 # Create empty lists for train and test annotations
