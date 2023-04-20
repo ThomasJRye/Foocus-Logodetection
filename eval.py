@@ -47,6 +47,7 @@ def evaluate_model(model, device, testing_loader):
                                 category_correct_labels[gt_label] += 1
                             break
 
+        
         # Calculate and print accuracy for each category
         for category in category_total_boxes.keys():
             box_accuracy = category_correct_boxes[category] / category_total_boxes[category]

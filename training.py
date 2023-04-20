@@ -2,8 +2,24 @@ import config
 import torch
 from utils import myOwnDataset
 from utils import get_transform, collate_fn
+import torchvision.transforms as transforms
+from torch.utils.data import WeightedRandomSampler
+from torchvision.models.detection import fasterrcnn_resnet50_fpn
 
-def train_model(model, device):
+def train_model(model, device, transforms = None):
+
+    if transforms is None:
+        # Create own Dataset
+        training_dataset = myOwnDataset(
+            root=config.data_dir, annotation=config.train_coco, transforms=get_transform()
+        )
+    else:
+        # Create own Dataset
+        training_dataset = myOwnDataset(
+            root=config.data_dir, annotation=config.train_coco, transforms=transforms
+        )
+        
+
     # Create own Dataset
     training_dataset = myOwnDataset(
         root=config.data_dir, annotation=config.train_coco, transforms=get_transform()
