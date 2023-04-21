@@ -69,7 +69,6 @@ def train_model(model, device, transforms = None):
             losses.backward()
             optimizer.step()
 
-            print(f"Iteration: {i}/{len_dataloader}, Loss: {losses}")
             sum_loss += losses
 
         # Print average loss for epoch

@@ -2,8 +2,9 @@ import torch
 from collections import defaultdict
 import detect_utils
 from coco_names import COCO_INSTANCE_CATEGORY_NAMES
+import csv
 
-def evaluate_model(model, device, testing_loader):
+def evaluate_model(model, device, testing_loader, csv_filename):
     model.eval()
 
     # Evaluate the model
@@ -46,6 +47,17 @@ def evaluate_model(model, device, testing_loader):
                             if gt_label == pred_label:
                                 category_correct_labels[gt_label] += 1
                             break
+        # Write results to CSV file
+        with open(csv_filename, 'w', newline='') as csvfile:
+            fieldnames = ['category', 'bounding_box_accuracy', 'label_accuracy']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for category in category_total_boxes.keys():
+                box_accuracy = category_correct_boxes[category] / category_total_boxes[category]
+                label_accuracy = category_correct_labels[category] / category_total_boxes[category]
+
+                writer.writerow({'category': category, 'bounding_box_accuracy': box_accuracy, 'label_accuracy': label_accuracy})
 
         
         # Calculate and print accuracy for each category
