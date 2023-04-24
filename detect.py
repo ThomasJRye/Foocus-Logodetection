@@ -30,9 +30,14 @@ args = vars(parser.parse_args())
 
 # Define the computation device.
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# download or load the model from disk
-model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
-                                                    min_size=args['min_size'])
+
+model = get_model()
+
+model.load_state_dict(torch.load('models/bigdata.pth', map_location=device))
+
+# # download or load the model from disk
+# model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
+#                                                     min_size=args['min_size'])
 image = Image.open(args['input'])
 
 model.eval().to(device)

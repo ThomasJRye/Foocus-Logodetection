@@ -18,7 +18,8 @@ def train_model(model, device, transforms = None):
         training_dataset = myOwnDataset(
             root=config.data_dir, annotation=config.train_coco, transforms=transforms
         )
-        
+    
+    print("training from: " + config.train_coco)
 
     # Create own Dataset
     training_dataset = myOwnDataset(

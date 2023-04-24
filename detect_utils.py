@@ -39,9 +39,9 @@ def predict(image, model, device, detection_threshold):
     print(coco_names)
     print(labels.cpu().numpy())
 
-    
+    label_indexes = labels.cpu().numpy() - 1
     # Get all the predicited class names.
-    pred_classes = [coco_names[i] if 0 <= i < len(coco_names) else 'unknown' for i in labels.cpu().numpy()]
+    pred_classes = [coco_names[i] if 0 <= i < len(coco_names) else 'unknown' for i in label_indexes]
 
     return boxes, pred_classes, labels
 
