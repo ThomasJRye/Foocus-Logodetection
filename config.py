@@ -1,12 +1,13 @@
 # path to your own data and coco file
-data_dir = "dataset1mvp/data"
-train_coco = "dataset1mvp/train.json"
-test_coco = "dataset1mvp/test.json"
+data_dir = "bigData1/data"
+train_coco = "bigData1/train.json"
+test_coco = "bigData1/test.json"
 
 
 # Batch size
-train_batch_size = 1
-test_batch_size = 1
+train_batch_size = 5
+test_batch_size = 5
+
 # Params for dataloader
 train_shuffle_dl = True
 num_workers_dl = 4
@@ -15,7 +16,7 @@ num_workers_dl = 4
 
 # Two classes; Only target class or background
 num_classes = 31
-num_epochs = 10
+num_epochs = 5
 
 lr = 0.005
 momentum = 0.9
