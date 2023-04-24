@@ -31,13 +31,9 @@ args = vars(parser.parse_args())
 # Define the computation device.
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = get_model()
-
-model.load_state_dict(torch.load('models/bigdata.pth', map_location=device))
-
-# # download or load the model from disk
-# model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
-#                                                     min_size=args['min_size'])
+# download or load the model from disk
+model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
+                                                    min_size=args['min_size'])
 image = Image.open(args['input'])
 
 model.eval().to(device)
@@ -50,3 +46,23 @@ cv2.imshow('Image', image)
 save_name = f"{args['input'].split('/')[-1].split('.')[0]}_{args['min_size']}"
 cv2.imwrite(f"outputs/{save_name}.jpg", image)
 cv2.waitKey(0)
+
+# model = get_model()
+
+# model.load_state_dict(torch.load('models/bigdata.pth', map_location=device))
+
+# # # download or load the model from disk
+# # model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
+# #                                                     min_size=args['min_size'])
+# image = Image.open(args['input'])
+
+# model.eval().to(device)
+
+# boxes, classes, labels = detect_utils.predict(image, model, device, 0.8)
+
+# image = detect_utils.draw_boxes(boxes, classes, labels, image)
+
+# cv2.imshow('Image', image)
+# save_name = f"{args['input'].split('/')[-1].split('.')[0]}_{args['min_size']}"
+# cv2.imwrite(f"outputs/{save_name}.jpg", image)
+# cv2.waitKey(0)

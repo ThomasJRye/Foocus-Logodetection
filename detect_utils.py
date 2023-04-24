@@ -36,12 +36,13 @@ def predict(image, model, device, detection_threshold):
     boxes = pred_bboxes[pred_scores >= detection_threshold].astype(np.int32)
     labels = outputs[0]['labels'][:len(boxes)]
 
-    print(coco_names)
     print(labels.cpu().numpy())
 
     label_indexes = labels.cpu().numpy() - 1
     # Get all the predicited class names.
-    pred_classes = [coco_names[i] if 0 <= i < len(coco_names) else 'unknown' for i in label_indexes]
+    # pred_classes = [coco_names[i] if 0 <= i < len(coco_names) else 'unknown' for i in label_indexes]
+
+    pred_classes = [coco_names[i] if 0 <= i < len(coco_names) else 'unknown' for i in labels.cpu().numpy()]
 
     return boxes, pred_classes, labels
 

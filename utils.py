@@ -103,23 +103,3 @@ def get_model_instance_segmentation(num_classes):
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, len(COCO_INSTANCE_CATEGORY_NAMES) + 1) # +1 for background class
 
     return model
-
-def get_model(model):
-    if model == 'v1':
-        # load an instance segmentation model pre-trained pre-trained on COCO
-        model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
-        # get number of input features for the classifier
-        in_features = model.roi_heads.box_predictor.cls_score.in_features
-        # replace the pre-trained head with a new one
-        model.roi_heads.box_predictor = FastRCNNPredictor(in_features, len(COCO_INSTANCE_CATEGORY_NAMES) + 1) # +1 for background class
-    elif model == 'v2':
-        # load an instance segmentation model pre-trained pre-trained on COCO
-        model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, min_size=args['min_size'])
-        # get number of input features for the classifier
-        in_features = model.roi_heads.box_predictor.cls_score.in_features
-        # replace the pre-trained head with a new one
-        model.roi_heads.box_predictor = FastRCNNPredictor(in_features, len(COCO_INSTANCE_CATEGORY_NAMES) + 1) # +1 for background class
-    else:
-        raise ValueError(f"Invalid model type {model}, please choose 'v1' or 'v2'")
-
-    return model
