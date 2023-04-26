@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import WeightedRandomSampler
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 
-def train_model(model, device, transforms = None):
+def train_model(model, device, transforms = None, writer = None):
 
     if transforms is None:
         # Create own Dataset
@@ -44,6 +44,7 @@ def train_model(model, device, transforms = None):
     len_dataloader = len(training_loader)
     loss_per_epoch = []
 
+
     # Training
     for epoch in range(config.num_epochs):
         print(f"Epoch: {epoch}/{config.num_epochs}")
@@ -70,7 +71,10 @@ def train_model(model, device, transforms = None):
             losses.backward()
             optimizer.step()
 
-            sum_loss += losses
+            sum_loss += losses  
+        
+        if writer is not None:
+            writer.add_scalar('Loss/train', sum_loss/len_dataloader, epoch)
 
         # Print average loss for epoch
         print(f"Average loss for epoch: {sum_loss/len_dataloader}")
