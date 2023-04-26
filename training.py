@@ -21,11 +21,6 @@ def train_model(model, device, transforms = None, writer = None):
     
     print("training from: " + config.train_coco)
 
-    # Create own Dataset
-    training_dataset = myOwnDataset(
-        root=config.data_dir, annotation=config.train_coco, transforms=get_transform()
-    )
-
     # Training DataLoader
     training_loader = torch.utils.data.DataLoader(
         training_dataset,
@@ -40,6 +35,8 @@ def train_model(model, device, transforms = None, writer = None):
     optimizer = torch.optim.SGD(
         params, lr=config.lr, momentum=config.momentum, weight_decay=config.weight_decay
     )
+
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=config.lr_step_size, gamma=config.lr_gamma)
 
     len_dataloader = len(training_loader)
     loss_per_epoch = []
@@ -72,10 +69,13 @@ def train_model(model, device, transforms = None, writer = None):
             optimizer.step()
 
             sum_loss += losses  
-        
-        if writer is not None:
-            writer.add_scalar('Loss/train', sum_loss/len_dataloader, epoch)
+            if writer is not None:
+                writer.add_scalar('Loss/train', sum_loss/len_dataloader, epoch)
 
+        
+        lr_scheduler.step()
+
+        
         # Print average loss for epoch
         print(f"Average loss for epoch: {sum_loss/len_dataloader}")
 

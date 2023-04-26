@@ -8,6 +8,10 @@ test_coco = "bigData1/test.json"
 train_batch_size = 5
 test_batch_size = 5
 
+#
+lr_step_size = 3
+lr_gamma = 0.1
+
 # Params for dataloader
 train_shuffle_dl = True
 num_workers_dl = 4
@@ -15,7 +19,7 @@ num_workers_dl = 4
 # Params for training
 
 # Two classes; Only target class or background
-num_classes = 31
+num_classes = 33
 num_epochs = 1
 
 lr = 0.005
