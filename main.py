@@ -38,7 +38,7 @@ if __name__ == '__main__':
     logdir = os.path.join("logs", datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     # Instantiate and train the model
-    notransform_model = model.get_model(device=device, model_name='v2')
+    notransform_model = model.get_model(device=device, model_name='v1')
 
     writer = SummaryWriter()
 

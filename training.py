@@ -67,12 +67,15 @@ def train_model(model, device, transforms = None, writer = None):
             optimizer.zero_grad()
             losses.backward()
             optimizer.step()
-
+            
+            if i == 10:
+                print(str(losses) + "epoch: " + str(epoch))
+                i = 0
+                      
             sum_loss += losses  
             if writer is not None:
                 writer.add_scalar('Loss/train', sum_loss/len_dataloader, epoch)
 
-        
         lr_scheduler.step()
 
         
