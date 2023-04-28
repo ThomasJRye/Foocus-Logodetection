@@ -6,8 +6,8 @@ import torchvision.transforms as transforms
 from torch.utils.data import WeightedRandomSampler
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 
-def train_model(model, device, transforms = None, writer = None):
 
+def train_model(model, device, transforms=None, writer=None):
     if transforms is None:
         # Create own Dataset
         training_dataset = myOwnDataset(
@@ -18,8 +18,13 @@ def train_model(model, device, transforms = None, writer = None):
         training_dataset = myOwnDataset(
             root=config.data_dir, annotation=config.train_coco, transforms=transforms
         )
-    
+
     print("training from: " + config.train_coco)
+
+    # Create own Dataset
+    training_dataset = myOwnDataset(
+        root=config.data_dir, annotation=config.train_coco, transforms=get_transform()
+    )
 
     # Training DataLoader
     training_loader = torch.utils.data.DataLoader(
@@ -36,19 +41,22 @@ def train_model(model, device, transforms = None, writer = None):
         params, lr=config.lr, momentum=config.momentum, weight_decay=config.weight_decay
     )
 
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=config.lr_step_size, gamma=config.lr_gamma)
+    # Add learning rate scheduler
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
     len_dataloader = len(training_loader)
     loss_per_epoch = []
 
+    model.train()
 
     # Training
     for epoch in range(config.num_epochs):
-        print(f"Epoch: {epoch}/{config.num_epochs}")
-        model.train()
+        ### epoch start ###
         i = 0
-
         sum_loss = 0
+        print(f"Epoch {epoch}, learning_rate = {optimizer.param_groups[0]['lr']}")
+        writer.add_scalar(tag='train/learning_rate', scalar_value=optimizer.param_groups[0]['lr'],
+                          global_step=epoch * len(training_loader) + i)
         for imgs, annotations in training_loader:
             i += 1
             imgs = list(img.to(device) for img in imgs)
@@ -67,19 +75,23 @@ def train_model(model, device, transforms = None, writer = None):
             optimizer.zero_grad()
             losses.backward()
             optimizer.step()
-            
-            if i == 10:
-                print(str(losses) + "epoch: " + str(epoch))
-                i = 0
-                      
-            sum_loss += losses  
-            if writer is not None:
-                writer.add_scalar('Loss/train', sum_loss/len_dataloader, epoch)
 
+            sum_loss += losses
+
+            print(f"Epoch: {epoch}/{config.num_epochs}, batch {i}/{len_dataloader}, sum_loss = {losses.item()}")
+
+            # Write loss to tensorboard
+            if writer is not None:
+                for k, v in loss_dict.items():
+                    if isinstance(v, torch.Tensor):
+                        v = v.item()
+                    writer.add_scalar(tag=f'train/{k}', scalar_value=v, global_step=epoch * len(training_loader) + i)
+
+        ### epoch end ###
+
+        # Update learning rate scheduler after epoch
         lr_scheduler.step()
 
-        
         # Print average loss for epoch
-        print(f"Average loss for epoch: {sum_loss/len_dataloader}")
-
-        loss_per_epoch.append(sum_loss/len_dataloader)
+        print(f"Average loss for epoch: {sum_loss / len_dataloader}")
+        loss_per_epoch.append(sum_loss / len_dataloader)
