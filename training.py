@@ -1,4 +1,5 @@
 import config
+from detect_utils import predict
 import torch
 from utils import myOwnDataset
 from utils import get_transform, collate_fn

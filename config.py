@@ -20,7 +20,7 @@ num_workers_dl = 4
 
 # Two classes; Only target class or background
 num_classes = 33
-num_epochs = 10
+num_epochs = 20
 
 lr = 0.005
 momentum = 0.9
