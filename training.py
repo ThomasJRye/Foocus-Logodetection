@@ -95,3 +95,6 @@ def train_model(model, device, transforms=None, writer=None):
         # Print average loss for epoch
         print(f"Average loss for epoch: {sum_loss / len_dataloader}")
         loss_per_epoch.append(sum_loss / len_dataloader)
+    # Save the trained weights.
+    model_weights_path = './models/model_weights.pth'
+    torch.save(model.state_dict(), model_weights_path)
