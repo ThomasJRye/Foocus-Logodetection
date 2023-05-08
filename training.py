@@ -99,7 +99,7 @@ def train_model(model, device, transforms=None, writer=None):
                 annotations = [{k: v.to(device) for k, v in t.items()} for t in annotations]
 
                 # Call the predict function to get the bounding boxes, class names, and labels.
-                boxes, classes, labels = predict(imgs, model, device)
+                boxes, classes, labels = predict(imgs, model, device, 0.5)
 
                 for idx, label in enumerate(labels):
                     gt_label = annotations[idx]["labels"]
