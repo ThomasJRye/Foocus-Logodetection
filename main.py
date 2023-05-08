@@ -13,49 +13,52 @@ from training import train_model
 from eval import evaluate_model
 import datetime, os
 
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+def main():
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-### TRAINING
+    ### TRAINING
 
-# Instantiate and train the model
-notransform_model = model.get_model(device=device)
+    # Instantiate and train the model
+    notransform_model = model.get_model(device=device)
 
-# Initialize tensorboard log, default location is runs/{date}
-writer = SummaryWriter()
+    # Initialize tensorboard log, default location is runs/{date}
+    writer = SummaryWriter()
 
-# Train the model
-train_model(notransform_model, device, transforms=None, writer=writer)
+    # Train the model
+    train_model(notransform_model, device, transforms=None, writer=writer)
 
-# save trained model
-model_path = os.path.join(writer.log_dir, "last.pth")
+    # save trained model
+    model_path = os.path.join(writer.log_dir, "last.pth")
 
-# Save the model
-print(f'Saving model to {model_path}')
-torch.save(notransform_model.state_dict(), model_path)
+    # Save the model
+    print(f'Saving model to {model_path}')
+    torch.save(notransform_model.state_dict(), model_path)
 
-# Close the SummaryWriter
-writer.close()
+    # Close the SummaryWriter
+    writer.close()
 
+    ### EVALUATION
 
-### EVALUATION
+    # Load json file
+    with open(config.test_coco) as f:
+        json_data = json.load(f)
 
-# Load json file
-with open(config.test_coco) as f:
-    json_data = json.load(f)
+    # Create test Dataset
+    testing_dataset = myOwnDataset(
+        root=config.data_dir, annotation=config.test_coco, transforms=get_transform()
+    )
 
-# Create test Dataset
-testing_dataset = myOwnDataset(
-    root=config.data_dir, annotation=config.test_coco, transforms=get_transform()
-)
+    # Testing DataLoader
+    testing_loader = torch.utils.data.DataLoader(
+        testing_dataset,
+        batch_size=config.test_batch_size,
+        shuffle=config.train_shuffle_dl,
+        num_workers=config.num_workers_dl,
+        collate_fn=collate_fn,
+    )
 
-# Testing DataLoader
-testing_loader = torch.utils.data.DataLoader(
-    testing_dataset,
-    batch_size=config.test_batch_size,
-    shuffle=config.train_shuffle_dl,
-    num_workers=config.num_workers_dl,
-    collate_fn=collate_fn,
-)
+    # Evaluate the model
+    evaluate_model(notransform_model, device, testing_loader, "notrans", print_results=True)
 
-# Evaluate the model
-evaluate_model(notransform_model, device, testing_loader, "notrans")
+if __name__ == '__main__':
+    main()

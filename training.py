@@ -55,6 +55,8 @@ def train_model(model, device, transforms=None, writer=None):
         i = 0
         sum_loss = 0
         print(f"Epoch {epoch}, learning_rate = {optimizer.param_groups[0]['lr']}")
+        correct_predictions = 0
+        total_predictions = 0
         writer.add_scalar(tag='train/learning_rate', scalar_value=optimizer.param_groups[0]['lr'],
                           global_step=epoch * len(training_loader) + i)
         for imgs, annotations in training_loader:
@@ -78,7 +80,7 @@ def train_model(model, device, transforms=None, writer=None):
 
             sum_loss += losses
 
-            print(f"Epoch: {epoch}/{config.num_epochs}, batch {i}/{len_dataloader}, sum_loss = {losses.item()}")
+            #print(f"Epoch: {epoch}/{config.num_epochs}, batch {i}/{len_dataloader}, sum_loss = {losses.item()}")
 
             # Write loss to tensorboard
             if writer is not None:
@@ -87,6 +89,25 @@ def train_model(model, device, transforms=None, writer=None):
                         v = v.item()
                     writer.add_scalar(tag=f'train/{k}', scalar_value=v, global_step=epoch * len(training_loader) + i)
 
+
+        # Calculate class accuracy
+        model.eval()
+        with torch.no_grad():
+            for imgs, annotations in training_loader:
+                imgs = list(img.to(device) for img in imgs)
+                annotations = [{k: v.to(device) for k, v in t.items()} for t in annotations]
+
+                # Call the predict function to get the bounding boxes, class names, and labels.
+                boxes, classes, labels = predict(imgs, model, device)
+
+                for idx, label in enumerate(labels):
+                    gt_label = annotations[idx]["labels"]
+                    total_predictions += gt_label.size(0)
+                    correct_predictions += (label == gt_label).sum().item()
+
+        accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+        print(f"Class accuracy for epoch {epoch}: {accuracy * 100:.2f}%")
+        model.train()
         ### epoch end ###
 
         # Update learning rate scheduler after epoch

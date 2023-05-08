@@ -4,7 +4,7 @@ import detect_utils
 from coco_names import COCO_INSTANCE_CATEGORY_NAMES
 import csv
 
-def evaluate_model(model, device, testing_loader, csv_filename):
+def evaluate_model(model, device, testing_loader, csv_filename, print_results=False):
     model.eval()
 
     # Evaluate the model
