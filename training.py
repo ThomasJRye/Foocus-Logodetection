@@ -97,14 +97,16 @@ def train_model(model, device, transforms=None, writer=None):
             for imgs, annotations in training_loader:
                 imgs = list(img.to(device) for img in imgs)
                 annotations = [{k: v.to(device) for k, v in t.items()} for t in annotations]
+                for idx, image in enumerate(imgs):
 
-                # Call the predict function to get the bounding boxes, class names, and labels.
-                boxes, classes, labels = predict(imgs, model, device, 0.5)
+                    image_np = image.cpu().numpy().transpose(1, 2, 0)
+                    # Call the predict function to get the bounding boxes, class names, and labels.
+                    boxes, classes, labels = predict(image_np, model, device, 0.5)
 
-                for idx, label in enumerate(labels):
                     gt_label = annotations[idx]["labels"]
                     total_predictions += gt_label.size(0)
-                    correct_predictions += (label == gt_label).sum().item()
+                    for lobel in labels:
+                        correct_predictions += (lobel == gt_label).sum().item()
 
         accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
         print(f"Class accuracy for epoch {epoch}: {accuracy * 100:.2f}%")
