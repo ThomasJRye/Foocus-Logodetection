@@ -104,9 +104,7 @@ def train_model(model, device, transforms=None, writer=None):
                     boxes, classes, labels = predict(image_np, model, device, 0.5)
 
                     gt_label = annotations[idx]["labels"]
-                    total_predictions += gt_label.size(0)
-                    for lobel in labels:
-                        correct_predictions += (lobel == gt_label).sum().item()
+                    
 
         accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
         print(f"Class accuracy for epoch {epoch}: {accuracy * 100:.2f}%")

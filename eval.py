@@ -21,8 +21,8 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
                 image_np = image.cpu().numpy().transpose(1, 2, 0)
 
                 boxes, pred_classes, labels = detect_utils.predict(image_np, model, device, 0.4)
-                print("labels: ")
-                print(pred_classes)
+                # print("labels: ")
+                # print(pred_classes)
 
                 gt_boxes = annotations[idx]['boxes'].cpu().numpy()
                 gt_labels = annotations[idx]['labels'].cpu().numpy()
@@ -34,7 +34,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
                         label_index = 0
                     correct_labels.append(COCO_INSTANCE_CATEGORY_NAMES[label_index])
 
-                print(correct_labels)
+                # print(correct_labels)
                 for gt_box, gt_label in zip(gt_boxes, correct_labels):
                     category_total_boxes[gt_label] += 1
                     iou_threshold = 0.5
