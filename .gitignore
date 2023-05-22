@@ -155,6 +155,8 @@ dataset1
 models/
 *.pth
 
+/images
+
 /dataset1AllAnno
 
 /bigData1
