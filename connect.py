@@ -46,6 +46,7 @@ def download_file_from_s3(s3_path, local_path):
 
 
     print(f'Downloaded {s3_path} to {local_path}')
+    
 def database():
 
     # Database credentials

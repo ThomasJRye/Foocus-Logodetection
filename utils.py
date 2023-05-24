@@ -103,3 +103,24 @@ def get_model_instance_segmentation(num_classes):
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, len(COCO_INSTANCE_CATEGORY_NAMES) + 1) # +1 for background class
 
     return model
+
+
+def import_from_S3(S3directory, filename, outputDirectory):
+
+    # load environment variables from .env file
+    load_dotenv()
+
+    # access specific s3 bucket
+    bucket_name = os.getenv('AWS_BUCKET')
+
+    # create an S3 client
+    s3 = boto3.client('s3')
+
+    # list all of the buckets in your account
+    response = s3.list_buckets()
+    print(response)
+
+
+    print(S3directory + filename)
+
+    s3.download_file(bucket_name, S3directory + filename, outputDirectory + filename)

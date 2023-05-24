@@ -22,6 +22,7 @@ def convert_to_coco(input_data, images_path):
     index = 0
     group_index = 0
 
+    
     for detections in grouped_detections:
         # print(group_index)
         group_index +=1
@@ -37,63 +38,82 @@ def convert_to_coco(input_data, images_path):
         groupTimeStr = detections[0]["timeBegin"]
         groupTime = time_in_sec(groupTimeStr)
 
-        
-
-
         groupFrame = getFrame(groupTime, fps, video_path)
         found_detection = False
+        # List to store rectangles of all detections
+        all_rectangles = []
         for detection in detections:
-            # if detection["confidence"] > 0.5 and detection["size"] != 'tiny':
-            if ((detection["confidence"] > 0.7 and detection["size"] != "tiny") or (detection["confidence"] > 0.99 and detection["size"] == "tiny")) and detection["areaPercentage"] > 0.005:
-            # if True:
-                
+            # your conditions for detection confidence, size, and area percentage
+            if ((detection["confidence"] > 0.7 and detection["size"] != "tiny") or 
+            (detection["confidence"] > 0.99 and detection["size"] == "tiny")) and detection["areaPercentage"] > 0.005:
 
-                x, y, width, height = calculate_bbox(detection["coordinates"][0])
-                timeBeginStr = detection["timeBegin"]
-                timeEndStr = detection["timeEnd"]
+                    x, y, width, height = calculate_bbox(detection["coordinates"][0])
 
-                
-                timeBegin = time_in_sec(timeBeginStr)
-                timeEnd = time_in_sec(timeEndStr)
-                
-                
+                    current_rectangle = [x, y, width, height]
+                    similar_to_previous = False  # initialize the flag as False
+                   
+                    # Loop through all the previous rectangles
+                    for previous_detection in all_rectangles:
+                        # If the names are the same and the similarity score is above the threshold
+                        if previous_detection['name'] == detection["name"] and \
+                        rectangle_similarity(current_rectangle, previous_detection['rectangle']) > 0.05:
+                            similar_to_previous = True  # set the flag to True
+                            break  # break the inner loop
 
-                start_frame = getFrame(timeBegin, fps, video_path)
-                end_frame = getFrame(timeEnd, fps, video_path)
+                    if similar_to_previous:
+                        continue  # if flag is True, skip to next detection
 
-                similarity_score = calculate_frame_similarity(start_frame, end_frame)
-                if (similarity_score < 70):
-                    found_detection = True
-                    print("___")
-                    print(detection["name"])
+                    timeBeginStr = detection["timeBegin"]
+                    timeEndStr = detection["timeEnd"]
 
-                    print(image_id)
-                    print(timeBeginStr)
-                    print(timeEndStr)
-                    print("score:", similarity_score)
-                    groupFrame = plot(groupFrame, [x, y, width, height], detection["name"])
+                    
+                    timeBegin = time_in_sec(timeBeginStr)
+                    timeEnd = time_in_sec(timeEndStr)
+                    
+                    
 
-                    annotation = {
-                        "id": index + 1,
-                        "image_id": image_id,
-                        "category_id": detection["visualClassId"],
-                        "bbox": [x, y, width, height],
-                        "area": width*height,
-                        "iscrowd": 0,
-                    }
-                    annotations.append(annotation)
+                    start_frame = getFrame(timeBegin, fps, video_path)
+                    end_frame = getFrame(timeEnd, fps, video_path)
 
-                    if detection["visualClassId"] not in category_ids:
-                        categories.append({
-                            "id": detection["visualClassId"],
-                            "name": detection["name"]
-                        })
-                        category_ids.add(detection["visualClassId"])
-        if found_detection:
-            plt.imshow(groupFrame)
-            plt.axis("off")
-            plt.savefig(f"{images_path}/frame_{image_id:06d}group{group_index}..jpg", bbox_inches='tight', pad_inches=0)
-            plt.close()
+                    similarity_score = calculate_frame_similarity(start_frame, end_frame)
+                    if (similarity_score < 70):
+                        found_detection = True
+                        print("___")
+                        print(detection["name"])
+
+                        print(image_id)
+                        print(timeBeginStr)
+                        print(timeEndStr)
+                        print("score:", similarity_score)
+                        groupFrame = plot(groupFrame, [x, y, width, height], detection["name"])
+
+                        annotation = {
+                            "id": index + 1,
+                            "image_id": image_id,
+                            "category_id": detection["visualClassId"],
+                            "bbox": [x, y, width, height],
+                            "area": width*height,
+                            "iscrowd": 0,
+                        }
+                        annotations.append(annotation)
+
+                        if detection["visualClassId"] not in category_ids:
+                            categories.append({
+                                "id": detection["visualClassId"],
+                                "name": detection["name"]
+                            })
+                            category_ids.add(detection["visualClassId"])
+            
+            if found_detection:
+                # Append the current rectangle and the detection's name to the list
+                all_rectangles.append({
+                    'rectangle': current_rectangle,
+                    'name': detection["name"]
+                })
+                plt.imshow(groupFrame)
+                plt.axis("off")
+                plt.savefig(f"{images_path}/frame_{image_id:06d}group{group_index}.jpg", bbox_inches='tight', pad_inches=0, dpi=300)
+                plt.close()
 
     coco_output = {
         "images": images,
@@ -176,7 +196,28 @@ def group_simultaneous_detections_rec(detections, fps, cap, grouped_detections):
 
     return group_simultaneous_detections_rec(detections[1:], fps, cap, grouped_detections)
 
+def rectangle_similarity(coordinatesA, coordinatesB):
+    bbox1 = calculate_bbox(coordinatesA)
+    bbox2 = calculate_bbox(coordinatesB)
 
+    # Determine the (x, y)-coordinates of the intersection rectangle
+    xA = max(bbox1[0], bbox2[0])
+    yA = max(bbox1[1], bbox2[1])
+    xB = min(bbox1[0]+bbox1[2], bbox2[0]+bbox2[2])
+    yB = min(bbox1[1]+bbox1[3], bbox2[1]+bbox2[3])
+
+    # Compute the area of intersection rectangle
+    interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
+
+    # Compute the area of both the prediction and ground-truth rectangles
+    boxAArea = bbox1[2] * bbox1[3]
+    boxBArea = bbox2[2] * bbox2[3]
+
+    # Compute the intersection over union by taking the intersection area and dividing it by the sum of prediction + ground-truth areas - the intersection area
+    iou = interArea / float(boxAArea + boxBArea - interArea)
+
+    # Return the intersection over union value
+    return iou
 
 
 
