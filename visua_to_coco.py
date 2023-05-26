@@ -4,7 +4,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def convert_to_coco(input_data, images_path):
+def convert_to_coco(input_data, images_path, video_path, existing_coco_file=None):
+    if existing_coco_file is None:
+        coco_data = {
+            "images": [],
+            "annotations": [],
+            "categories": []
+        }
+    else:
+        # Load the existing COCO dataset
+        with open(existing_coco_file) as f:
+            coco_data = json.load(f)
 
     detections = input_data["data"]["detections"]
     images = []
@@ -12,13 +22,12 @@ def convert_to_coco(input_data, images_path):
     categories = []
 
     category_ids = set()
-    video_path = "/Users/thomasrye/Documents/github/Foocus-Logodetection/videos/210509_Eurosport_Fotballdirekte_Eliteserien.mp4"
     cap = cv2.VideoCapture(video_path)
     fps = cap.get(cv2.CAP_PROP_FPS)
     cap.release()
     
     grouped_detections = group_simultaneous_detections(detections, fps, video_path)
-    image_id = 0
+    image_id = len(coco_data["images"])
     index = 0
     group_index = 0
 
@@ -32,7 +41,7 @@ def convert_to_coco(input_data, images_path):
             "id": image_id,
             "width": input_data["data"]["mediaInfo"]["width"],
             "height": input_data["data"]["mediaInfo"]["height"],
-            "file_name": f"{images_path}/frame_{image_id:06d}/group{group_index}.jpg"
+            "file_name": f"{image_id}/.jpg"
         }
         images.append(image)
         groupTimeStr = detections[0]["timeBegin"]
@@ -120,7 +129,15 @@ def convert_to_coco(input_data, images_path):
         "annotations": annotations,
         "categories": categories,
     }
-    return coco_output
+    if existing_coco_file is None:
+        with open("newfile.json", "w") as json_file:
+            json.dump(coco_output, json_file, indent=2)
+    # Save the updated  dataset to a new file or overwrite the existing file
+    else:
+        with open(existing_coco_file, "w") as outfile:
+            json.dump(coco_data, outfile, indent=2)
+
+    print("Annotations added to the COCO dataset.")
 
 def calculate_bbox(coordinates):
     x_coords = coordinates[::2]
@@ -225,6 +242,7 @@ def calculate_frame_similarity(frame1, frame2):
     mse = np.mean((frame1 - frame2) ** 2)
     return mse
 
+
 # Remove the "images" directory
 os.system("rm -r images")
 
@@ -234,10 +252,9 @@ os.makedirs("images")
 with open("visua_analyses/1383.json") as f:
     input_data = json.load(f)
 
-images_path = "./images"
-coco_output = convert_to_coco(input_data, images_path)
+images_path = "./bigData1/images"
+video_path = "/Users/thomasrye/Documents/github/Foocus-Logodetection/videos/210509_Eurosport_Fotballdirekte_Eliteserien.mp4"
+existing_coco_file = "bigData1/labels.json"
 
-with open("coco_annotations.json", "w") as outfile:
-    json.dump(coco_output, outfile, indent=2)
+convert_to_coco(input_data, images_path, video_path)
 
-print("COCO annotations file saved as 'coco_annotations.json'")
