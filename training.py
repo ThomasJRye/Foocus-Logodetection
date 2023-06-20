@@ -98,8 +98,15 @@ def train_model(model, device, transforms=None, writer=None):
                 imgs = list(img.to(device) for img in imgs)
                 annotations = [{k: v.to(device) for k, v in t.items()} for t in annotations]
                 for idx, image in enumerate(imgs):
-
                     image_np = image.cpu().numpy().transpose(1, 2, 0)
+                    
+                    # Check if there are any boxes in the annotations
+                    has_boxes = any(anno['boxes'].size(0) > 0 for anno in annotations[idx:idx+1])
+
+                    # If there are no boxes in the image, skip the iteration
+                    if not has_boxes:
+                        continue
+
                     # Call the predict function to get the bounding boxes, class names, and labels.
                     boxes, classes, labels = predict(image_np, model, device, 0.5)
 

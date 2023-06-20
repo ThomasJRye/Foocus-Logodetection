@@ -5,7 +5,7 @@ from coco_names import COCO_INSTANCE_CATEGORY_NAMES
 def get_model(device='cpu', model_name="v1"):
     # Load the model.
     if model_name == 'v2':
-        model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights="DEFUALT")
+        model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights="DEFAULT")
     elif model_name == 'v1':
         # load model pretrained on COCO
         model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights="DEFAULT")

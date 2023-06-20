@@ -1,52 +1,56 @@
 import os
+import sys
 import mysql.connector
 import boto3
 from dotenv import load_dotenv
 from visua_to_coco import convert_to_coco
+import json
+from tqdm import tqdm
+import cv2
 
-def import_from_S3(S3directory, filename, outputDirectory):
+def import_from_S3(S3directory, filename, outputDirectory=None):
     try:
 
-        # load environment variables from .env file
-        load_dotenv()
-
-        # access specific s3 bucket
+        # Access specific S3 bucket
         bucket_name = os.getenv('AWS_BUCKET')
 
-        # create an S3 client
+        # Create an S3 client
         s3 = boto3.client('s3')
-
-        # list all of the buckets in your account
-        response = s3.list_buckets()
-        print(response)
-
-
-        # print(S3directory + filename)
-        # # Foqus/spect8-static/video-analysis/113.json
-        # source = "video-analysis/113.json"
-        # s3.download_file(bucket_name, source, outputDirectory + filename)
-        # Specify the S3 directory, filename, and output directory
-        # S3directory = "video-analysis/"
-        # filename = "113.json"
-        # outputDirectory = "output/"
 
         # Construct the source path
         source = S3directory + filename
 
-        # Download the file from S3
-        print(source)
-        dot_count = source.count('.')
-        if dot_count == 2:
-            print("The string contains exactly two dots.")
-            filename = '.'.join(filename.split('.')[:-2])
-        else:
-            print("The string does not contain exactly two dots.")
+        # Check if the file exists in S3
+        response = s3.head_object(Bucket=bucket_name, Key=source)
+        error_code = getattr(response, 'response', {}).get('Error', {}).get('Code')
+        output_directory = os.path.join(outputDirectory, '') if outputDirectory else ''
 
-        print(bucket_name, source, outputDirectory + filename)
-        s3.download_file(bucket_name, source, outputDirectory + filename)
+        if error_code == '404':
+            response = s3.head_object(Bucket=bucket_name, Key=source.replace('visua/', ''))
+            error_code = getattr(response, 'response', {}).get('Error', {}).get('Code')
 
+            if error_code == '404':
+                print(source, "not found")
+                return False
+            else:   
+                print(bucket_name, source, output_directory + filename)
+                s3.download_file(bucket_name, source.replace('visua/', ''), output_directory + filename)
+                return True
+
+
+        print(bucket_name, source, output_directory + filename)
+        s3.download_file(bucket_name, source, output_directory + filename)
+
+        # Return True to indicate successful download
+        return True
+    
+    except FileNotFoundError:
+        print(f"File not found on S3: {filename}")
+        return False
     except Exception as e:
-            print(f"Error occurred during S3 download: {str(e)}")
+        print(f"Error occurred during S3 download: {str(e)}")
+        # Return False to indicate failure in download
+        return False
 
 def main():
     try:
@@ -61,29 +65,68 @@ def main():
         )
 
         cursor = conn.cursor()
-
-        number_of_videos = 10
-        query = "select logograb_videos.url,logograb_video_analysis.json_url  from logograb_videos inner join logograb_video_analysis on logograb_videos.id = logograb_video_analysis.video_id limit " + str(number_of_videos) + ";"
-
+        number_of_videos = 1000
+        query = "SELECT logograb_videos.url, logograb_video_analysis.json_url FROM logograb_videos INNER JOIN logograb_video_analysis ON logograb_videos.id = logograb_video_analysis.video_id ORDER BY logograb_videos.id DESC LIMIT " + str(number_of_videos) + ";"
+        print(query)
         cursor.execute(query)
 
         result = cursor.fetchall()
+        image_id = 3000
+
+        output_directory = sys.argv[1] if len(sys.argv) > 1 else None
 
         for video_url, analysis_url in result:
+            found = True
             print(video_url, analysis_url)
-            if (analysis_url is not None):
-                import_from_S3(S3directory='', filename=analysis_url, outputDirectory='')
-                json_file_path = os.path.join(outputDirectory, analysis_url)
-                images_path = "/path/to/images"  # Specify the desired output path for images
-                video_path = "/path/to/video.mp4"  # Specify the path to the corresponding video file
-                existing_coco_file = "existing_coco.json"  # Specify the path to an existing COCO JSON file if available
+            if analysis_url is not None:
+                import_from_S3(S3directory="", filename=analysis_url, outputDirectory=output_directory)
+                json_file_path = analysis_url
+                # existing_coco_file = "existing_coco.json"  # Specify the path to an existing COCO JSON file if available
                 with open(json_file_path) as f:
                     input_data = json.load(f)
-                convert_to_coco(input_data, images_path, video_path, existing_coco_file)
-            if (video_url is not None):
-                filename = video_url.replace('http://spect8-static.s3.amazonaws.com/', '/videos/')
-                import_from_S3(S3directory="visua/", filename=filename, outputDirectory="/videos")
-            
+
+                if video_url is not None:
+                    filename = video_url.replace('http://spect8-static.s3.amazonaws.com/', '')
+                    if not import_from_S3(S3directory="", filename=filename, outputDirectory=output_directory):
+                        continue
+
+                    video_path = os.path.join(output_directory, filename)  # Specify the path to the corresponding video file
+
+                    image_id = convert_to_coco(input_data, os.path.join(output_directory, 'images'), video_path, image_id)
+
+                    video_file = os.path.join(video_path, os.path.basename(filename))
+
+                    if not os.path.isfile(video_file):
+                        print(f"Video file '{video_file}' not found.")
+                        continue
+
+                    try:
+                        # Open the video file
+                        cap = cv2.VideoCapture(video_file)
+
+                        # Check if the video file was successfully opened
+                        if not cap.isOpened():
+                            print(f"Failed to open video file '{video_file}'")
+                            continue
+
+                        # Read frames from the video
+                        while True:
+                            ret, frame = cap.read()
+
+                            # Check if a frame was successfully read
+                            if not ret:
+                                print("Failed to capture frame from video")
+                                break
+
+                            # Process the frame here
+
+                        # Release the video file capture
+                        cap.release()
+                        os.remove(video_file)
+
+                    except Exception as e: 
+                        print(f"An error occurred while processing the video: {str(e)}")
+
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 

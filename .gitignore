@@ -127,7 +127,7 @@ venv.bak/
 /site
 /mvpDataset
 /dataset1mvp
-
+/annotated_images
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -143,6 +143,7 @@ visua/
 .visua/
 /data
 /dataset
+/video-analysis
 dataset
 .dataset1/.
 dataset1
@@ -154,7 +155,7 @@ dataset1
 .models/
 models/
 *.pth
-
+/video-analysis
 /images
 
 /dataset1AllAnno
