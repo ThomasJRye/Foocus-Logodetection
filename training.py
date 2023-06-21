@@ -114,6 +114,7 @@ def train_model(model, device, transforms=None, writer=None):
                     gt_labels = annotations[idx]["labels"]
                     unique_predicted_labels = list(set(predicted_labels))
                     found = []
+                    correct_predictions = 0
                     for pred_label in unique_predicted_labels:
                         if pred_label in gt_labels and pred_label not in found:
                             correct_predictions+=1
