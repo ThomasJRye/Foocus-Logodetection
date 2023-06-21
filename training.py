@@ -112,14 +112,13 @@ def train_model(model, device, transforms=None, writer=None):
 
                     gt_labels = annotations[idx]["labels"]
                     unique_predicted_labels = list(set(predicted_labels))
-                    unique_gt_labels = list(set(gt_labels))
                     found = []
+                    
                     for pred_label in unique_predicted_labels:
-                        for gt_label in unique_gt_labels:
-                            if pred_label == gt_label and pred_label not in found and gt_label not in found:
-                                found+=pred_label
-                                found+=gt_label
-                                correct_predictions+=1
+                        if pred_label in unique_predicted_labels and pred_label not in found:
+                            correct_predictions+=1
+                            found.append(pred_label)
+                                
                     total_predictions = len(unique_predicted_labels)
         accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
         print(f"Class accuracy for epoch {epoch}: {accuracy * 100:.2f}%")
