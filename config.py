@@ -5,8 +5,8 @@ test_coco = "bigData1/test.json"
 
 
 # Batch size
-train_batch_size = 15
-test_batch_size = 15
+train_batch_size = 7
+test_batch_size = 7
 
 
 
