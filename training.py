@@ -43,7 +43,7 @@ def train_model(model, device, transforms=None, writer=None):
     )
 
     # Add learning rate scheduler
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=config.lr_step_size, gamma=config.lr_gamma)
 
     len_dataloader = len(training_loader)
     loss_per_epoch = []
