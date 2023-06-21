@@ -58,7 +58,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
                             break
 
                     # Save the image with bounding boxes
-                    image_with_boxes = draw_boxes(image_np, boxes)
+                    image_with_boxes = draw_boxes(image, boxes)
                     save_path = os.path.join(save_directory, f'image_{idx}.jpg')
                     cv2.imwrite(save_path, image_with_boxes)
 
