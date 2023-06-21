@@ -6,7 +6,7 @@ from utils import get_transform, collate_fn
 import torchvision.transforms as transforms
 from torch.utils.data import WeightedRandomSampler
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
-
+import statistics
 
 def train_model(model, device, transforms=None, writer=None):
     if transforms is None:
@@ -93,6 +93,7 @@ def train_model(model, device, transforms=None, writer=None):
 
         # Calculate class accuracy
         model.eval()
+        class_accuracies = []
         with torch.no_grad():
             for imgs, annotations in training_loader:
                 imgs = list(img.to(device) for img in imgs)
@@ -120,8 +121,12 @@ def train_model(model, device, transforms=None, writer=None):
                             found.append(pred_label)
                                 
                     total_predictions = len(unique_predicted_labels)
-        accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
-        print(f"Class accuracy for epoch {epoch}: {accuracy * 100:.2f}%")
+                accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+
+                class_accuracies.append(accuracy)
+        class_accuracy = statistics.mean(class_accuracies)
+
+        print(f"Class accuracy for epoch {epoch}: {class_accuracy * 100:.2f}%")
         model.train()
         ### epoch end ###
 
