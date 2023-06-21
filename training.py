@@ -43,6 +43,7 @@ def train_model(model, device, transforms=None, writer=None):
     )
 
     # Add learning rate scheduler
+    #lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=config.lr_step_size, gamma=config.lr_gamma)
 
     len_dataloader = len(training_loader)
@@ -108,10 +109,13 @@ def train_model(model, device, transforms=None, writer=None):
                         continue
 
                     # Call the predict function to get the bounding boxes, class names, and labels.
-                    boxes, classes, labels = predict(image_np, model, device, 0.5)
+                    boxes, classes, predicted_labels = predict(image_np, model, device, 0.5)
 
-                    gt_label = annotations[idx]["labels"]
+                    gt_labels = annotations[idx]["labels"]
                     
+                    
+                    for pred_labels, gt_labels in zip(predicted_labels, annotations["labels"]):
+                        correct_predictions += (pred_labels == gt_labels).sum().item()
 
         accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
         print(f"Class accuracy for epoch {epoch}: {accuracy * 100:.2f}%")
