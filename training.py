@@ -114,8 +114,10 @@ def train_model(model, device, transforms=None, writer=None):
                     gt_labels = annotations[idx]["labels"]
                     
                     
-                    for pred_labels, gt_labels in zip(predicted_labels, annotations["labels"]):
-                        correct_predictions += (pred_labels == gt_labels).sum().item()
+                    for pred_label in predicted_labels:
+                        for gt_label in gt_labels:
+                            print(pred_label)
+                            print(gt_label)
 
         accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
         print(f"Class accuracy for epoch {epoch}: {accuracy * 100:.2f}%")
