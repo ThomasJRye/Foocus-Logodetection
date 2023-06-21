@@ -58,7 +58,6 @@ def train_model(model, device, transforms=None, writer=None):
         sum_loss = 0
         print(f"Epoch {epoch}, learning_rate = {optimizer.param_groups[0]['lr']}")
         correct_predictions = 0
-        total_predictions = 0
         writer.add_scalar(tag='train/learning_rate', scalar_value=optimizer.param_groups[0]['lr'],
                           global_step=epoch * len(training_loader) + i)
         for imgs, annotations in training_loader:
@@ -112,13 +111,14 @@ def train_model(model, device, transforms=None, writer=None):
                     boxes, classes, predicted_labels = predict(image_np, model, device, 0.5)
 
                     gt_labels = annotations[idx]["labels"]
-                    
-                    
-                    for pred_label in predicted_labels:
-                        for gt_label in gt_labels:
-                            print(pred_label)
-                            print(gt_label)
+                    unique_predicted_labels = list(set(predicted_labels))
+                    unique_gt_labels = list(set(gt_labels))
 
+                    for pred_label in unique_predicted_labels:
+                        for gt_label in unique_gt_labels:
+                            if pred_label == gt_label:
+                                correct_predictions+=1
+                    total_predictions = len(unique_predicted_labels)
         accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
         print(f"Class accuracy for epoch {epoch}: {accuracy * 100:.2f}%")
         model.train()
