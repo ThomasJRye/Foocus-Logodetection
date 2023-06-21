@@ -84,11 +84,11 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
             print(f"Bounding Box Accuracy: {box_accuracy * 100:.2f}%")
             print(f"Label Accuracy: {label_accuracy * 100:.2f}%")
 
-    def draw_boxes(image, boxes):
-        image_with_boxes = image.copy()
+def draw_boxes(image, boxes):
+    image_with_boxes = image.copy()
 
-        for box in boxes:
-            x1, y1, x2, y2 = box
-            cv2.rectangle(image_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)
-        
-        return image_with_boxes
+    for box in boxes:
+        x1, y1, x2, y2 = box
+        cv2.rectangle(image_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    
+    return image_with_boxes

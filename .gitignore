@@ -150,10 +150,6 @@ dataset1
 /input
 /output
 /outputs
-.models
-/models.
-.models/
-models/
 *.pth
 /video-analysis
 /images
