@@ -86,9 +86,13 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
 
 def draw_boxes(image, boxes):
     # image_with_boxes = image.copy()
+    try:
 
-    for box in boxes:
-        x1, y1, x2, y2 = box
-        cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        for box in boxes:
+            x1, y1, x2, y2 = box
+            print(box)
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    except:
+        print("Error:" + str(box))
     
     return image
