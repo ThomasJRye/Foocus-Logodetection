@@ -16,13 +16,13 @@ train_shuffle_dl = True
 num_workers_dl = 4
 
 # Params for training
-lr_step_size = 3
+lr_step_size = 2
 lr_gamma = 0.1
 
 # Two classes; Only target class or background
-num_classes = 157
-num_epochs = 12
+num_classes = 32
+num_epochs = 10
 
-lr = 0.005
+lr = 0.01
 momentum = 0.9
 weight_decay = 0.005
