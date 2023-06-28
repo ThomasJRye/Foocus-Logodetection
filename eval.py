@@ -85,14 +85,13 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
             print(f"Label Accuracy: {label_accuracy * 100:.2f}%")
 
 def draw_boxes(image, boxes):
-    # image_with_boxes = image.copy()
-    try:
+    image_with_boxes = image.copy()
 
+    try:
         for box in boxes:
             x1, y1, x2, y2 = box
-            print(box)
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-    except:
-        print("Error:" + str(box))
+            cv2.rectangle(image_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    except Exception as e:
+        print("Error:", str(e))
     
-    return image
+    return image_with_boxes
