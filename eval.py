@@ -84,7 +84,9 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
             print(f"Bounding Box Accuracy: {box_accuracy * 100:.2f}%")
             print(f"Label Accuracy: {label_accuracy * 100:.2f}%")
 
-def draw_boxes(image, boxes):
+def draw_boxes(image_tensor, boxes):
+    # Convert image tensor to numpy array
+    image = image_tensor.cpu().numpy().transpose(1, 2, 0)
     image_with_boxes = image.copy()
 
     try:
