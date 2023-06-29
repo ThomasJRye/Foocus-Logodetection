@@ -17,7 +17,7 @@ num_workers_dl = 4
 
 # Params for training
 lr_step_size = 2
-lr_gamma = 0.1
+lr_gamma = 0.4
 
 # Two classes; Only target class or background
 num_classes = 32
