@@ -25,7 +25,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
         for imgs, annotations in testing_loader:
             imgs = list(img.to(device) for img in imgs)
             annotations = [{k: v.to(device) for k, v in t.items()} for t in annotations]
-
+            i = 0
             for idx, image in enumerate(imgs):
                 image_np = image.cpu().numpy().transpose(1, 2, 0)
 
@@ -58,7 +58,8 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
                             break
 
                     # Save the image with bounding boxes
-                    image_with_boxes = draw_boxes(image, boxes)
+                    image_with_boxes = draw_boxes(image, boxes, i)
+                    i += 1
                     save_path = os.path.join(save_directory, f'image_{idx}.jpg')
                     cv2.imwrite(save_path, image_with_boxes)
 
@@ -84,7 +85,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
             print(f"Bounding Box Accuracy: {box_accuracy * 100:.2f}%")
             print(f"Label Accuracy: {label_accuracy * 100:.2f}%")
 
-def draw_boxes(image_tensor, boxes):
+def draw_boxes(image_tensor, boxes, i):
     # Convert image tensor to numpy array
     image = image_tensor.cpu().numpy().transpose(1, 2, 0)
     image_with_boxes = image.copy()
@@ -95,7 +96,7 @@ def draw_boxes(image_tensor, boxes):
             cv2.rectangle(image_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
         # Save image with bounding boxes
-        save_path = os.path.join(os.getcwd(), 'detections', 'image_with_boxes.jpg')
+        save_path = os.path.join(os.getcwd(), 'detections/' + str(i) + '.jpg')
         cv2.imwrite(save_path, image_with_boxes)
     except Exception as e:
         print("Error:", str(e))
