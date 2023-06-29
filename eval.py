@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from collections import defaultdict
 import detect_utils
@@ -62,7 +63,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
                     image_with_boxes = draw_boxes(image, boxes, i)
                     i += 1
                     save_path = os.path.join(save_directory, f'image_{idx}.jpg')
-                    cv2.imwrite(save_path, image_with_boxes)
+                    # cv2.imwrite(save_path, image_with_boxes)
 
         # Write results to CSV file
         with open(csv_filename, 'w', newline='') as csvfile:
@@ -89,8 +90,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
 def draw_boxes(image_tensor, boxes, i):
     # Convert image tensor to numpy array
     pil_image = transforms.ToPILImage()(image_tensor)
-
-
+    pil_image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
     try:
         for box in boxes:
             x1, y1, x2, y2 = box
