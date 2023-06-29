@@ -94,9 +94,11 @@ def draw_boxes(image_tensor, boxes):
             x1, y1, x2, y2 = box
             cv2.rectangle(image_with_boxes, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-            #save image
-        cv2.imwrite(os.cwd + 'detections/image_with_boxes.jpg', image_with_boxes)
+        # Save image with bounding boxes
+        save_path = os.path.join(os.getcwd(), 'detections', 'image_with_boxes.jpg')
+        cv2.imwrite(save_path, image_with_boxes)
     except Exception as e:
         print("Error:", str(e))
     
     return image_with_boxes
+
