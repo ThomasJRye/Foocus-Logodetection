@@ -17,11 +17,11 @@ num_workers_dl = 4
 
 # Params for training
 lr_step_size = 2
-lr_gamma = 0.4
+lr_gamma = 0.6
 
 # Two classes; Only target class or background
 num_classes = 32
-num_epochs = 10
+num_epochs = 1
 
 lr = 0.01
 momentum = 0.9

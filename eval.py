@@ -5,6 +5,7 @@ from coco_names import COCO_INSTANCE_CATEGORY_NAMES
 import csv
 import cv2
 import os
+import torchvision.transforms as transforms
 
 def evaluate_model(model, device, testing_loader, csv_filename, print_results=False):
     model.eval()
@@ -86,26 +87,20 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
             print(f"Label Accuracy: {label_accuracy * 100:.2f}%")
 
 def draw_boxes(image_tensor, boxes, i):
+    # Convert image tensor to numpy array
+    pil_image = transforms.ToPILImage()(image_tensor)
 
-    image = cv2.cvtColor(image_tensor.asarray(image), cv2.COLOR_BGR2RGB)
+
     try:
         for box in boxes:
-            
-            cv2.rectangle(
-            image,
-            (int(box[0]), int(box[1])),
-            (int(box[2]), int(box[3])),
-            (0, 255, 0),
-        )
-            cv2.putText(image, coco_names[i], (int(box[0]), int(box[1]-5)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2, 
-                    lineType=cv2.LINE_AA)
-            
+            x1, y1, x2, y2 = box
+            cv2.rectangle(pil_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
         # Save image with bounding boxes
         save_path = os.path.join(os.getcwd(), 'detections/' + str(i) + '.jpg')
-        cv2.imwrite(save_path, image)
+        cv2.imwrite(save_path, pil_image)
     except Exception as e:
         print("Error:", str(e))
     
-    return image
+    return pil_image
 
