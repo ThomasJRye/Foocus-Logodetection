@@ -21,7 +21,7 @@ lr_gamma = 0.6
 
 # Two classes; Only target class or background
 num_classes = 32
-num_epochs = 1
+num_epochs = 12
 
 lr = 0.01
 momentum = 0.9
