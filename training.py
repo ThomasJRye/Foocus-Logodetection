@@ -8,7 +8,53 @@ from torch.utils.data import WeightedRandomSampler
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 import statistics
 
-def train_model(model, device, transforms=None, writer=None):
+
+import json
+import random
+
+def partition_dataset(data_dir, split_ratio):
+    # Load COCO annotations file
+    labels_file = f"{data_dir}/labels_coop.json"
+    with open(labels_file, "r") as f:
+        coco = json.load(f)
+
+    # Create empty lists for train and test annotations
+    train = {"images": [], "annotations": [], "categories": coco["categories"]}
+    test = {"images": [], "annotations": [], "categories": coco["categories"]}
+
+    # Loop over images and annotations and randomly assign them to train or test
+    for image in coco["images"]:
+        # Get image id
+        image_id = image["id"]
+
+        # Get corresponding annotations
+        anns = [ann for ann in coco["annotations"] if ann["image_id"] == image_id]
+
+        # Randomly choose train or test based on split ratio
+        if random.random() < split_ratio:
+            # Assign image and annotations to train
+            train["images"].append(image)
+            train["annotations"].extend(anns)
+        else:
+            # Assign image and annotations to test
+            test["images"].append(image)
+            test["annotations"].extend(anns)
+
+    # Save train and test annotations as new JSON files
+    train_file = f"{data_dir}/train.json"
+    with open(train_file, "w") as f:
+        json.dump(train, f)
+
+    test_file = f"{data_dir}/test.json"
+    with open(test_file, "w") as f:
+        json.dump(test, f)
+
+
+def train_model(model, data_dir, device, transforms=None, writer=None):
+    # Partition the dataset
+    split_ratio = 0.8  # 80% train, 20% test
+    partition_dataset(data_dir, split_ratio)
+
     if transforms is None:
         # Create own Dataset
         training_dataset = myOwnDataset(
