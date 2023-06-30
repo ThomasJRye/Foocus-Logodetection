@@ -7,6 +7,7 @@ import csv
 import cv2
 import os
 import torchvision.transforms as transforms
+import pandas as pd
 
 def evaluate_model(model, device, testing_loader, csv_filename, print_results=False):
     model.eval()
@@ -76,6 +77,17 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
                 label_accuracy = category_correct_labels[category] / category_total_boxes[category]
 
                 writer.writerow({'category': category, 'bounding_box_accuracy': box_accuracy, 'label_accuracy': label_accuracy})
+        
+        # Write results to Excel file
+        results = []
+        for category in category_total_boxes.keys():
+            box_accuracy = category_correct_boxes[category] / category_total_boxes[category]
+            label_accuracy = category_correct_labels[category] / category_total_boxes[category]
+            results.append({'category': category, 'bounding_box_accuracy': box_accuracy, 'label_accuracy': label_accuracy})
+
+        excel_filename = 'results.xlsx'
+        df = pd.DataFrame(results)
+        df.to_excel(excel_filename, index=False)
 
         
         # Calculate and print accuracy for each category
