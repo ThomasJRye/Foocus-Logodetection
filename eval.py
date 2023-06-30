@@ -30,8 +30,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
             annotations = [{k: v.to(device) for k, v in t.items()} for t in annotations]
             i = 0
             for idx, image in enumerate(imgs):
-                i += 1
-                
+                i +=1
                 image_np = image.cpu().numpy().transpose(1, 2, 0)
 
                 boxes, pred_classes, labels = detect_utils.predict(image_np, model, device, 0.4)
@@ -106,12 +105,12 @@ def draw_boxes(image_tensor, boxes, label, i):
     pil_image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
     try:
-        for box, lbl in zip(boxes, label):
+        for box in boxes:
             x1, y1, x2, y2 = box
             cv2.rectangle(pil_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             # Add label text above the box
-            cv2.putText(pil_image, lbl, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+            cv2.putText(pil_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
         # Save image with bounding boxes
         save_path = os.path.join(os.getcwd(), 'detections/' + str(i) + '.jpg')
