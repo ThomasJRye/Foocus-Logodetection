@@ -14,7 +14,7 @@ import random
 
 def partition_dataset(data_dir, split_ratio):
     # Load COCO annotations file
-    labels_file = f"{data_dir}/labels_coop.json"
+    labels_file = f"{data_dir}/labels.json"
     with open(labels_file, "r") as f:
         coco = json.load(f)
 

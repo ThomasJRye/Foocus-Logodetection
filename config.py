@@ -1,5 +1,5 @@
 # path to your own data and coco file
-data_dir = "bigData2/"
+data_dir = "bigData2/data/"
 train_coco = "bigData2/train.json"
 test_coco = "bigData2/test.json"
 
