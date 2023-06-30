@@ -63,7 +63,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
                             break
 
                     # Save the image with bounding boxes
-                    image_with_boxes = draw_boxes(image, boxes, i)
+                    image_with_boxes = draw_boxes(image, boxes, gt_label, i)
                     save_path = os.path.join(save_directory, f'image_{idx}.jpg')
                     # cv2.imwrite(save_path, image_with_boxes)
 
@@ -100,20 +100,25 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
             print(f"Bounding Box Accuracy: {box_accuracy * 100:.2f}%")
             print(f"Label Accuracy: {label_accuracy * 100:.2f}%")
 
-def draw_boxes(image_tensor, boxes, i):
+def draw_boxes(image_tensor, boxes, label, i):
     # Convert image tensor to numpy array
     pil_image = transforms.ToPILImage()(image_tensor)
     pil_image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+
     try:
-        for box in boxes:
+        for box, lbl in zip(boxes, label):
             x1, y1, x2, y2 = box
             cv2.rectangle(pil_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+            # Add label text above the box
+            cv2.putText(pil_image, lbl, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
 
         # Save image with bounding boxes
         save_path = os.path.join(os.getcwd(), 'detections/' + str(i) + '.jpg')
         cv2.imwrite(save_path, pil_image)
     except Exception as e:
         print("Error:", str(e))
-    
+
     return pil_image
+
 
