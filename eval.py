@@ -30,7 +30,8 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
             annotations = [{k: v.to(device) for k, v in t.items()} for t in annotations]
             i = 0
             for idx, image in enumerate(imgs):
-                i +=1
+                print(len(imgs))
+                i += 1
                 image_np = image.cpu().numpy().transpose(1, 2, 0)
 
                 boxes, pred_classes, labels = detect_utils.predict(image_np, model, device, 0.4)
@@ -60,7 +61,7 @@ def evaluate_model(model, device, testing_loader, csv_filename, print_results=Fa
                             if gt_label == pred_label:
                                 category_correct_labels[gt_label] += 1
                             break
-
+                    
                     # Save the image with bounding boxes
                     image_with_boxes = draw_boxes(image, boxes, gt_label, i)
                     save_path = os.path.join(save_directory, f'image_{idx}.jpg')
