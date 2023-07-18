@@ -1,7 +1,7 @@
 import json
 
 # Specify the path to your COCO annotations JSON file
-coco_annotations_file = '/Users/thomasrye/Documents/github/Foocus-Logodetection/bigData2/labels_coop.json'
+coco_annotations_file = '/Users/thomasrye/Documents/github/Foocus-Logodetection/Thomas_Foocus_COCO/labels_coop.json'
 
 # Open the JSON file
 with open(coco_annotations_file, 'r') as file:

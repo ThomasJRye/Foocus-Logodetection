@@ -1,7 +1,7 @@
 # path to your own data and coco file
-data_dir = "bigData2/data/"
-train_coco = "bigData2/train.json"
-test_coco = "bigData2/test.json"
+data_dir = "Thomas_Foocus_COCO/data/"
+train_coco = "Thomas_Foocus_COCO/train.json"
+test_coco = "Thomas_Foocus_COCO/test.json"
 
 
 # Batch size

@@ -8,7 +8,7 @@ from pycocotools.coco import COCO
 import os
 
 def main():
-    coco_annotation_file_path = "bigData2/labels_with_extra_new.json"
+    coco_annotation_file_path = "Thomas_Foocus_COCO/instances_default.json"
     coco_annotation = COCO(annotation_file=coco_annotation_file_path)
 
     # Category IDs.
@@ -32,6 +32,7 @@ def main():
             continue
         img_info = coco_annotation.loadImgs([img_id])[0]
         img_file_name = img_info["file_name"]
+        # image_path = os.getcwd() + '/revData/data/' + img_file_name
         image_path = os.getcwd() + '/' + img_file_name
         print(f"Processing Image ID: {img_id}, File Name: {img_file_name}, Image path: {image_path}")
 

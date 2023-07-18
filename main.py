@@ -25,7 +25,7 @@ def main():
     writer = SummaryWriter()
 
     # Train the model
-    train_model(notransform_model,"bigData2", device, transforms=None, writer=writer)
+    train_model(notransform_model,"Thomas_Foocus_COCO", device, transforms=None, writer=writer)
 
     # save trained model
     model_path = os.path.join(writer.log_dir, "last.pth")

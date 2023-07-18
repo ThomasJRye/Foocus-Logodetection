@@ -2,7 +2,7 @@ import json
 import random
 
 # Load COCO annotations file
-with open("bigData2/labels_coop.json", "r") as f:
+with open("Thomas_Foocus_COCO/instances_default.json", "r") as f:
     coco = json.load(f)
 
 # Create empty lists for train and test annotations
@@ -31,8 +31,8 @@ for image in coco["images"]:
         test["annotations"].extend(anns)
 
 # Save train and test annotations as new JSON files
-with open("bigData2/train.json", "w") as f:
+with open("Thomas_Foocus_COCO/train.json", "w") as f:
     json.dump(train, f)
 
-with open("bigData2/test.json", "w") as f:
+with open("Thomas_Foocus_COCO/test.json", "w") as f:
     json.dump(test, f)
