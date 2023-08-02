@@ -7,14 +7,12 @@ import torchvision.transforms as transforms
 from torch.utils.data import WeightedRandomSampler
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 import statistics
-
-
 import json
 import random
 
 def partition_dataset(data_dir, split_ratio):
     # Load COCO annotations file
-    labels_file = f"{data_dir}/instances_default.json"
+    labels_file = f"{data_dir}instances_default.json"
     with open(labels_file, "r") as f:
         coco = json.load(f)
 
@@ -58,19 +56,19 @@ def train_model(model, data_dir, device, transforms=None, writer=None):
     if transforms is None:
         # Create own Dataset
         training_dataset = myOwnDataset(
-            root=config.data_dir, annotation=config.train_coco, transforms=get_transform()
+            root=data_dir, annotation=config.train_coco, transforms=get_transform()
         )
     else:
         # Create own Dataset
         training_dataset = myOwnDataset(
-            root=config.data_dir, annotation=config.train_coco, transforms=transforms
+            root=data_dir, annotation=config.train_coco, transforms=transforms
         )
 
     print("training from: " + config.train_coco)
 
     # Create own Dataset
     training_dataset = myOwnDataset(
-        root=config.data_dir, annotation=config.train_coco, transforms=get_transform()
+        root=data_dir, annotation=config.train_coco, transforms=get_transform()
     )
 
     # Training DataLoader

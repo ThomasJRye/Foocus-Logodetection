@@ -16,6 +16,9 @@ import datetime, os
 def main():
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
+     # Get the data_dir from user input
+    data_dir = input("Please enter the data directory: ")
+
     ### TRAINING
 
     # Instantiate and train the model
@@ -25,7 +28,7 @@ def main():
     writer = SummaryWriter()
 
     # Train the model
-    train_model(notransform_model,"Thomas_Foocus_COCO", device, transforms=None, writer=writer)
+    train_model(notransform_model, data_dir, device, transforms=None, writer=writer)
 
     # save trained model
     model_path = os.path.join(writer.log_dir, "last.pth")
@@ -45,7 +48,7 @@ def main():
 
     # Create test Dataset
     testing_dataset = myOwnDataset(
-        root=config.data_dir, annotation=config.test_coco, transforms=get_transform()
+        root=data_dir, annotation=config.test_coco, transforms=get_transform()
     )
 
     # Testing DataLoader

@@ -1,8 +1,6 @@
 # path to your own data and coco file
-data_dir = "Thomas_Foocus_COCO/data/"
-train_coco = "Thomas_Foocus_COCO/train.json"
-test_coco = "Thomas_Foocus_COCO/test.json"
-
+data_dir = "Logodetection.v3i.coco/"
+roboflow = True
 
 # Batch size
 train_batch_size = 7
